@@ -15,6 +15,23 @@
   "author": "Rajeh Taher",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./lib/index.js",
+      "require": "./lib/index.js",
+      "types": "./lib/index.d.ts"
+    },
+    "./WAProto": {
+      "import": "./WAProto/index.js",
+      "require": "./WAProto/index.js",
+      "types": "./WAProto/index.d.ts"
+    },
+    "./WAProto/*": {
+      "import": "./WAProto/*.js",
+      "require": "./WAProto/*.js",
+      "types": "./WAProto/*.d.ts"
+    }
+  },
   "files": [
     "lib/*",
     "WAProto/*",
