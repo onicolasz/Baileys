@@ -971,7 +971,6 @@ export const makeChatsSocket = (config: SocketConfig) => {
 			if(!authState.creds?.myAppStateKeyId && !config.mobile) {
 				ev.buffer()
 				needToFlushWithAppStateSync = true
-				ev.flush()
 			}
 		}
 	})
