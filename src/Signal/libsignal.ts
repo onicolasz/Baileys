@@ -1,7 +1,7 @@
 /* @ts-ignore */
 import * as libsignal from 'libsignal'
-import { SignalAuthState, SignalKeyStoreWithTransaction } from '../Types'
-import { SignalRepository } from '../Types/Signal'
+import type { SignalAuthState, SignalKeyStoreWithTransaction } from '../Types'
+import type { SignalRepository } from '../Types/Signal'
 import { generateSignalPubKey } from '../Utils'
 import { jidDecode } from '../WABinary'
 import type { SenderKeyStore } from './Group/group_cipher'

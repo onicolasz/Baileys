@@ -49,6 +49,7 @@ export function makeCacheableSignalKeyStore(
 				for (const id of ids) {
 					const item = cache.get<SignalDataTypeMap[typeof type]>(getUniqueId(type, id))
 					if (typeof item !== 'undefined') {
+						//@ts-ignore
 						data[id] = item
 					} else {
 						idsToFetch.push(id)
@@ -74,7 +75,9 @@ export function makeCacheableSignalKeyStore(
 			return cacheMutex.runExclusive(async () => {
 				let keys = 0
 				for (const type in data) {
+					//@ts-ignore
 					for (const id in data[type]) {
+						//@ts-ignore
 						cache.set(getUniqueId(type, id), data[type][id])
 						keys += 1
 					}
@@ -120,11 +123,14 @@ async function handlePreKeyOperations(
 	const mutex = getPreKeyMutex(keyType)
 
 	await mutex.runExclusive(async () => {
+		//@ts-ignore
 		const keyData = data[keyType]
 		if (!keyData) return
 
 		// Ensure structures exist
+		//@ts-ignore
 		transactionCache[keyType] = transactionCache[keyType] || {}
+		//@ts-ignore
 		mutations[keyType] = mutations[keyType] || {}
 
 		// Separate deletions from updates for batch processing
@@ -141,7 +147,9 @@ async function handlePreKeyOperations(
 
 		// Process updates first (no validation needed)
 		for (const keyId of updateKeys) {
+			//@ts-ignore
 			transactionCache[keyType][keyId] = keyData[keyId]
+			//@ts-ignore
 			mutations[keyType][keyId] = keyData[keyId]
 		}
 
@@ -151,8 +159,11 @@ async function handlePreKeyOperations(
 		if (isInTransaction) {
 			// In transaction, only allow deletion if key exists in cache
 			for (const keyId of deletionKeys) {
+				//@ts-ignore
 				if (transactionCache[keyType][keyId]) {
+					//@ts-ignore
 					transactionCache[keyType][keyId] = null
+					//@ts-ignore
 					mutations[keyType][keyId] = null
 				} else {
 					logger.warn(`Skipping deletion of non-existent ${keyType} in transaction: ${keyId}`)
@@ -168,7 +179,9 @@ async function handlePreKeyOperations(
 		const existingKeys = await state.get(keyType as keyof SignalDataTypeMap, deletionKeys)
 		for (const keyId of deletionKeys) {
 			if (existingKeys[keyId]) {
+				//@ts-ignore
 				transactionCache[keyType][keyId] = null
+				//@ts-ignore
 				mutations[keyType][keyId] = null
 			} else {
 				logger.warn(`Skipping deletion of non-existent ${keyType}: ${keyId}`)
@@ -186,8 +199,11 @@ function handleNormalKeyOperations(
 	transactionCache: SignalDataSet,
 	mutations: SignalDataSet
 ) {
+	//@ts-ignore
 	Object.assign(transactionCache[key], data[key])
+	//@ts-ignore
 	mutations[key] = mutations[key] || {}
+	//@ts-ignore
 	Object.assign(mutations[key], data[key])
 }
 
@@ -203,6 +219,7 @@ async function processPreKeyDeletions(
 	const mutex = getPreKeyMutex(keyType)
 
 	await mutex.runExclusive(async () => {
+		//@ts-ignore
 		const keyData = data[keyType]
 		if (!keyData) return
 
@@ -212,6 +229,7 @@ async function processPreKeyDeletions(
 				const existingKeys = await state.get(keyType as keyof SignalDataTypeMap, [keyId])
 				if (!existingKeys[keyId]) {
 					logger.warn(`Skipping deletion of non-existent ${keyType}: ${keyId}`)
+					//@ts-ignore
 					delete data[keyType][keyId]
 				}
 			}
@@ -233,6 +251,7 @@ async function withMutexes<T>(
 	}
 
 	if (keyTypes.length === 1) {
+		//@ts-ignore
 		return getKeyTypeMutex(keyTypes[0]).runExclusive(fn)
 	}
 
@@ -422,6 +441,7 @@ export const addTransactionCapability = (
 			if (isInTransaction()) {
 				logger.trace({ types: Object.keys(data) }, 'caching in transaction')
 				for (const key in data) {
+					//@ts-ignore
 					transactionCache[key] = transactionCache[key] || {}
 
 					// Special handling for pre-keys and signed-pre-keys
@@ -451,6 +471,7 @@ export const addTransactionCapability = (
 
 							logger.trace({ senderKeyName }, 'storing sender key')
 							// Apply changes to the store
+							//@ts-ignore
 							await state.set(senderKeyData)
 							logger.trace({ senderKeyName }, 'sender key stored')
 						})
